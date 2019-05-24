@@ -308,16 +308,16 @@ its place.
 """
 function poisson_dirichlet_fft!(u::NodeData{NX,NY}) where {NX,NY}
 
-  f = view(u,2:NX,2:NY) # interior nodes only
-  f .= FFTW.dst(f,1)
-  f .= FFTW.dst(f,2)
+  f = view(u,2:NX,2:NY)
+  pr = FFTW.plan_r2r(f, FFTW.RODFT00, 1);
+
+  f .= (pr*(pr*f)')'
 
   Λ = zero(f)
   Λ .= cos.(pi*(1:NX-1)'/NX) .+ cos.(pi*(1:NY-1)/NY) .- 2ones(NX-1,NY-1)
   f .= 0.5*f./Λ
 
-  f .= FFTW.idst(f,1)
-  f .= FFTW.idst(f,2)
+  f .= 0.25*(pr*(pr*f)')'/NX/NY
 
   return u
 
