@@ -304,7 +304,8 @@ end
 
 Uses a discrete sine transform to solve a Dirichlet problem. The right-hand
 side should be supplied as the sole argument, and the solution is returned in
-its place.
+its place. Note that this method presumes that non-zero Dirichlet conditions have
+already been supplied via forcing on the right-hand side, in `u`.
 """
 function poisson_dirichlet_fft!(u::NodeData{NX,NY}) where {NX,NY}
 
