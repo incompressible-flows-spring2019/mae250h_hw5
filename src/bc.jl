@@ -79,6 +79,31 @@ function apply_bc!(u::CellData{NX,NY},t::Real,p::ScalarDirichletParameters) wher
 end
 
 """
+    apply_bc!(u::EdgeData,t,p<:VectorDirichletParameters) -> EdgeData
+
+Apply Dirichlet boundary conditions (specified in the Parameters structure `p`) at time
+`t` in the given edge data `u`, overwriting the boundary and ghost values
+in `u` with new values.
+"""
+function apply_bc!(u::NodeData{NX,NY},t::Real,p::ScalarDirichletParameters) where {NX,NY}
+
+    # get the index ranges needed
+    i = indices(u,1)
+    j = indices(u,2)
+
+    x = xmap(i,u,p)
+    y = ymap(j,u,p)
+
+    # on all sides, set values directly
+    u[1,   j] .= p.uL.(y,t)
+    u[NX+1,j] .= p.uR.(y,t)
+    u[i,   1] .= p.uB.(x,t)
+    u[i,NY+1] .= p.uT.(x,t)
+
+    return u
+end
+
+"""
     apply_dirichlet_bc!(u::EdgeData) -> EdgeData
 
 Apply zero Dirichlet boundary conditions in the given edge data `u`, overwriting
@@ -112,6 +137,8 @@ function apply_dirichlet_bc!(u::EdgeData{NX,NY}) where {NX,NY}
 
     return u
 end
+
+
 
 """
     apply_dirichlet_bc!(u::CellData) -> CellData
